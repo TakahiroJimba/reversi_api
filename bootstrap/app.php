@@ -52,4 +52,7 @@ $app->singleton(
 |
 */
 
+// 定数ファイルを読み込む
+require_once app_path() . '/config/const.php';
+
 return $app;
