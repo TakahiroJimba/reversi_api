@@ -19,6 +19,8 @@ class LoginController extends Controller
         $id = $_POST["id"];
         $password = $_POST["password"];
 
+        // TODO: バリデーション 
+
         // TODO: ログイン認証
 
         if (strval($password) == "password")
