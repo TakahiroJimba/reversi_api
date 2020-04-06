@@ -13,7 +13,15 @@ class ConfigsTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('configs', function (Blueprint $table) {
+            $table->increments('id')->index();
+            $table->integer('user_id')->unsigned()->index();
+            $table->integer('lang_id')->unsigned();
+            $table->timestamps();
+            $table->softDeletes();      // deleted_at
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            $table->foreign('lang_id')->references('id')->on('langs')->onDelete('cascade');
+        });
     }
 
     /**

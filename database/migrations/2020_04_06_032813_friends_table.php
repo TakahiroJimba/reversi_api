@@ -13,7 +13,16 @@ class FriendsTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('friends', function (Blueprint $table) {
+            $table->increments('id')->index();
+            $table->integer('user_id')->unsigned()->index();
+            $table->integer('user_id2')->unsigned()->index();
+            $table->string('message');
+            $table->timestamps();
+            // $table->softDeletes();      // deleted_at
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            $table->foreign('user_id2')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**

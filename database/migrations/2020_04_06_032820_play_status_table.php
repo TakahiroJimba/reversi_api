@@ -17,7 +17,10 @@ class PlayStatusTable extends Migration
             $table->increments('id')->index();
             $table->integer('user_id')->unsigned()->index();
             $table->integer('game_mode_id')->unsigned()->index();
-            $table->integer('play_count')->unsigned();
+            $table->integer('wins')->unsigned();
+            $table->integer('defeats')->unsigned();
+            $table->integer('drows')->unsigned();
+            $table->integer('disconnect_count')->unsigned();
             $table->bigInteger('play_time')->unsigned();
             $table->timestamps();
             $table->softDeletes();      // deleted_at

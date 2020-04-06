@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ScoreTable extends Migration
+class LangsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,12 @@ class ScoreTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('langs', function (Blueprint $table) {
+            $table->increments('id')->index();
+            $table->string('name');
+            //$table->timestamps();
+            $table->softDeletes();      // deleted_at
+        });
     }
 
     /**
