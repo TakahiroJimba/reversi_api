@@ -13,7 +13,17 @@ class PlayStatusTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('play_status', function (Blueprint $table) {
+            $table->increments('id')->index();
+            $table->integer('user_id')->unsigned()->index();
+            $table->integer('game_mode_id')->unsigned()->index();
+            $table->integer('play_count')->unsigned();
+            $table->bigInteger('play_time')->unsigned();
+            $table->timestamps();
+            $table->softDeletes();      // deleted_at
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            $table->foreign('game_mode_id')->references('id')->on('game_mode')->onDelete('cascade');
+        });
     }
 
     /**

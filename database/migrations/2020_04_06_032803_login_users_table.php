@@ -13,7 +13,13 @@ class LoginUsersTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('login_users', function (Blueprint $table) {
+            $table->integer('user_id')->unsigned()->index();
+            $table->string('session_id');
+            $table->timestamp('expiration_date');
+            $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+        });
     }
 
     /**
