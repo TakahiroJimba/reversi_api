@@ -26,17 +26,40 @@ class UserController extends Controller
         $name = $_POST["name"];
         $password = $_POST["password"];
 
-        // バリデーション
-        // TODO: 実装
+        // --- バリデーション ---
+        // アプリ側で実施したものと同様にバリデーション
+        $err_msgs = $this->validate_user_basic_info($mail_address, $name, $password);
+        if (isset($err_msgs) && count($err_msgs) != 0)
+        {
+            $ret_data["err_msgs"] = $err_msgs;
+            log::error("バリデーションエラー 不正な操作がされた可能性があります。".$mail_address." ".$name." ".$password);
+            return json_encode($ret_data);
+        }
 
-        // 仮登録処理
-        $now = Carbon::now();
+        // メールアドレス、ニックネームの重複チェック
+        if(!$this->is_unique_mail_address($mail_address))
+        {
+            $err_msg = "すでに登録されているメールアドレスです。";
+            $ret_data["err_msgs"] = array($err_msg);
+            log::warning($mail_address."はすでに登録されています。");
+            return json_encode($ret_data);
+        }
+        if(!$this->is_unique_name($name))
+        {
+            $err_msg = "すでに登録されているニックネームです。";
+            $ret_data["err_msgs"] = array($err_msg);
+            log::warning($name."はすでに登録されています。");
+            return json_encode($ret_data);
+        }
+
         // 4桁の認証コードを生成
         $pass_phrase = "";
         for ($i = 0; $i < USER_REGISTRATION_PASS_PHRASE_LENGTH; $i++) {
             $pass_phrase .= rand(0, 9);
         }
 
+        // 仮登録処理
+        $now = Carbon::now();
         $temp_user = [
             'mail_address'  => $mail_address,
             'name'          => $name,
@@ -68,4 +91,64 @@ class UserController extends Controller
         $ret_data["is_success"] = true;
         return json_encode($ret_data);
     }
+
+    // ユーザ情報バリデーション
+    private function validate_user_basic_info($mail_address, $name, $password)
+    {
+        $err_msgs = array();
+
+        // メールアドレス
+        if ($mail_address == "")
+        {
+            $err_msgs[] = 'メールアドレスを入力してください。';
+        }
+        elseif (!preg_match("/^[a-zA-Z0-9_.+-]+[@][a-zA-Z0-9.-]+$/", $mail_address))
+        {
+            $err_msgs[] = 'メールアドレスに登録できない文字が含まれている、または不正なメールアドレスです。';
+        }
+
+        // ニックネーム
+        if ($name == "")
+        {
+            $err_msgs[] = 'ニックネームを入力してください。';
+        }
+        elseif (mb_strlen($name) > USER_NAME_MAX_LENGTH)
+        {
+            $err_msgs[] = 'ニックネームは'.USER_NAME_MAX_LENGTH.'文字以内で入力してください。';
+        }
+
+        // パスワード
+        if (!preg_match("/^[a-zA-Z0-9]{".USER_PASSWORD_MIN_LENGTH.",".USER_PASSWORD_MAX_LENGTH."}+$/", $password))
+        {
+            $err_msgs[] = 'パスワードは半角英数字' . USER_PASSWORD_MIN_LENGTH . '〜' . USER_PASSWORD_MAX_LENGTH . '文字で入力してください。';
+        }
+        return $err_msgs;
+    }
+
+    // メールアドレス重複チェック
+    private function is_unique_mail_address($mail_address)
+    {
+        // ユーザ情報をDBから取得
+        $user      = DB::table('users')->where('mail_address', $mail_address)->first();
+        $temp_user = DB::table('temp_users')->where('mail_address', $mail_address)->first();
+        if (isset($user) || isset($temp_user))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    // ニックネーム重複チェック
+    private function is_unique_name($name)
+    {
+        // ユーザ情報をDBから取得
+        $user      = DB::table('users')->where('name', $name)->first();
+        $temp_user = DB::table('temp_users')->where('name', $name)->first();
+        if (isset($user) || isset($temp_user))
+        {
+            return false;
+        }
+        return true;
+    }
+
 }
