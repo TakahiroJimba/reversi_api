@@ -14,7 +14,9 @@ use Illuminate\Http\Request;
 */
 
 // ユーザ登録
-Route::post('registration_user', 'Api\UserController@regist');
+Route::post('user_registration',        'Api\UserController@regist');
+Route::post('user_unique_name',         'Api\UserController@isUniqueName');
+Route::post('user_unique_mail_address', 'Api\UserController@isUniqueMailAddress');
 
 // ログイン認証
 Route::post('login_auth',    'Api\LoginController@auth');

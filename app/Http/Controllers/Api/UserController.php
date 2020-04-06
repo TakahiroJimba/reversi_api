@@ -92,6 +92,22 @@ class UserController extends Controller
         return json_encode($ret_data);
     }
 
+    // メールアドレス重複チェック
+    public function isUniqueMailAddress()
+    {
+        $mail_address = $_POST["mail_address"];
+        $ret_data["is_unique"] = $this->is_unique_mail_address($mail_address);
+        return json_encode($ret_data);
+    }
+
+    // ニックネーム重複チェック
+    public function isUniqueName()
+    {
+        $name = $_POST["name"];
+        $ret_data["is_unique"] = $this->is_unique_name($name);
+        return json_encode($ret_data);
+    }
+
     // ユーザ情報バリデーション
     private function validate_user_basic_info($mail_address, $name, $password)
     {
