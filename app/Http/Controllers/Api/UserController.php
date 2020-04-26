@@ -72,6 +72,7 @@ class UserController extends Controller
         try
         {
             DB::table("temp_users")->insert($temp_user);
+            // TODO: code_authテーブルにレコード追加、トランザクションにする
         }
         catch (\Exception $e)
         {
@@ -89,6 +90,26 @@ class UserController extends Controller
         Mail::to($mail_address)->send(new RegisterShipped($sendData));
 
         $ret_data["is_success"] = true;
+        return json_encode($ret_data);
+    }
+
+    // 仮登録後の認証と本登録
+    public function registAuth()
+    {
+        $mail_address = $_POST["mail_address"];
+        $pass_phrase = $_POST["pass_phrase"];
+
+        // 仮登録ユーザ情報を、メールアドレスと認証コードで検索
+        $temp_user = DB::table('temp_users')
+            ->where('mail_address', $mail_address)
+            ->where('pass_phrase', $pass_phrase)
+            //->where('created_at', '>=', Carbon::now()->subHour()  // 仮登録の期限は1時間
+            ->whereNull('deleted_at')
+            ->first();
+
+        // 仮登録を削除
+        // 本登録
+
         return json_encode($ret_data);
     }
 
@@ -146,8 +167,8 @@ class UserController extends Controller
     {
         // ユーザ情報をDBから取得
         $user      = DB::table('users')->where('mail_address', $mail_address)->first();
-        $temp_user = DB::table('temp_users')->where('mail_address', $mail_address)->first();
-        if (isset($user) || isset($temp_user))
+        // $temp_user = DB::table('temp_users')->where('mail_address', $mail_address)->first();
+        if (isset($user)/* || isset($temp_user)*/)
         {
             return false;
         }
@@ -159,8 +180,8 @@ class UserController extends Controller
     {
         // ユーザ情報をDBから取得
         $user      = DB::table('users')->where('name', $name)->first();
-        $temp_user = DB::table('temp_users')->where('name', $name)->first();
-        if (isset($user) || isset($temp_user))
+        // $temp_user = DB::table('temp_users')->where('name', $name)->first();
+        if (isset($user)/* || isset($temp_user)*/)
         {
             return false;
         }

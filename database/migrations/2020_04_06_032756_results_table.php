@@ -14,7 +14,7 @@ class ResultsTable extends Migration
     public function up()
     {
         Schema::create('results', function (Blueprint $table) {
-            $table->increments('id')->index();
+            $table->integer('id')->unsigned()->unique()->index();
             $table->string('name');
             $table->string('name_en');
             //$table->timestamps();

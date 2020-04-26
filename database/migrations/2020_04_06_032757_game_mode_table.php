@@ -14,7 +14,7 @@ class GameModeTable extends Migration
     public function up()
     {
         Schema::create('game_mode', function (Blueprint $table) {
-            $table->increments('id')->index();
+            $table->integer('id')->unsigned()->unique()->index();
             $table->string('name');
             $table->string('name_en');
             //$table->timestamps();

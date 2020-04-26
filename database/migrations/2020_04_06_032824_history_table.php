@@ -25,8 +25,8 @@ class HistoryTable extends Migration
             $table->integer('your_game_time')->unsigned();
             $table->timestamps();
             $table->softDeletes();      // deleted_at
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
-            $table->foreign('opponent_user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            // $table->foreign('opponent_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('result_id')->references('id')->on('results')->onDelete('cascade');
         });
     }

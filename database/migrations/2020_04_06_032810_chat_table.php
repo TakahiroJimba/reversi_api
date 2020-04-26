@@ -20,8 +20,8 @@ class ChatTable extends Migration
             $table->string('message');
             $table->timestamps();
             $table->softDeletes();      // deleted_at
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
-            $table->foreign('receive_user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            // $table->foreign('receive_user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

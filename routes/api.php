@@ -13,13 +13,14 @@ use Illuminate\Http\Request;
 |
 */
 
-// ユーザ登録
-Route::post('user_registration',        'Api\UserController@regist');
-Route::post('user_unique_name',         'Api\UserController@isUniqueName');
-Route::post('user_unique_mail_address', 'Api\UserController@isUniqueMailAddress');
-
-// ログイン認証
-Route::post('login_auth',    'Api\LoginController@auth');
+// // ユーザ登録
+// Route::post('user_registration',        'Api\UserController@regist');
+// Route::post('user_unique_name',         'Api\UserController@isUniqueName');
+// Route::post('user_unique_mail_address', 'Api\UserController@isUniqueMailAddress');
+// Route::post('user_auth',                'Api\UserController@registAuth');
+//
+// // ログイン認証
+// Route::post('login_auth',    'Api\LoginController@auth');
 
 // ルーム関連
 Route::post('create_room',   'Api\RoomController@create');

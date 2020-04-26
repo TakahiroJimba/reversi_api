@@ -18,13 +18,16 @@ class PlayStatusTable extends Migration
             $table->integer('user_id')->unsigned()->index();
             $table->integer('game_mode_id')->unsigned()->index();
             $table->integer('wins')->unsigned();
-            $table->integer('defeats')->unsigned();
+            $table->integer('loses')->unsigned();
             $table->integer('drows')->unsigned();
+            $table->integer('surrenders')->unsigned();
+            $table->integer('surrenders_opponent')->unsigned();
             $table->integer('disconnect_count')->unsigned();
+            $table->integer('disconnect_count_opponent')->unsigned();
             $table->bigInteger('play_time')->unsigned();
             $table->timestamps();
             $table->softDeletes();      // deleted_at
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
             $table->foreign('game_mode_id')->references('id')->on('game_mode')->onDelete('cascade');
         });
     }

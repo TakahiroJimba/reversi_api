@@ -19,8 +19,8 @@ class ConfigsTable extends Migration
             $table->integer('lang_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();      // deleted_at
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
-            $table->foreign('lang_id')->references('id')->on('langs')->onDelete('cascade');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
+            // $table->foreign('lang_id')->references('id')->on('langs')->onDelete('cascade');
         });
     }
 
