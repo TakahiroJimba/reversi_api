@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class OnlineGameTable extends Migration
+class GameTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class OnlineGameTable extends Migration
      */
     public function up()
     {
-        Schema::create('online_game', function (Blueprint $table) {
+        Schema::create('game', function (Blueprint $table) {
             $table->increments('id')->index();
             $table->integer('user_id')->unsigned()->index();
             $table->integer('challenger_user_id')->unsigned()->index();
