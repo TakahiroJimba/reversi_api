@@ -27,5 +27,6 @@ Route::post('create_room',   'Api\RoomController@create');
 Route::post('watch_room',    'Api\RoomController@watch');
 
 // ゲーム関連
-Route::post('get_priority',  'Api\GameController@getPriority');
-Route::post('set_turn',      'Api\GameController@setTurn');
+Route::post('create_offline_game',  'Api\GameController@createOfflineGame');
+Route::post('get_priority',         'Api\GameController@getPriority');
+Route::post('set_turn',             'Api\GameController@setTurn');

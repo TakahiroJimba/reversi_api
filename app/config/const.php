@@ -19,5 +19,5 @@
     define('GAME_MODE_ID_ONLINE_FREE',       22);
 
     // 別ドメインからのアクセスを受け付ける場合に必要
-    // header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Origin: *");
 ?>
