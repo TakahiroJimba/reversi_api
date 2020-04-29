@@ -28,5 +28,7 @@ Route::post('watch_room',    'Api\RoomController@watch');
 
 // ゲーム関連
 Route::post('create_offline_game',  'Api\GameController@createOfflineGame');
+Route::post('put_stone',            'Api\GameController@putStone');
+Route::post('judge',                'Api\GameController@judge');
 Route::post('get_priority',         'Api\GameController@getPriority');
 Route::post('set_turn',             'Api\GameController@setTurn');
