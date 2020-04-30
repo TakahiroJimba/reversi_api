@@ -90,8 +90,9 @@ class Game extends Model
     }
 
     // 石が置けるか確認
-    static public function canPut($game, $loc_x, $loc_y)
+    static public function canPut($game, $loc_x, $loc_y, $turn_now)
     {
+        $stone_number = $turn_now ? Game::$FIRST_COLOR_STONE : Game::$SECOND_COLOR_STONE;
         $board_size = $game->board_size;
         $put_target_cell = $game->cells[$loc_y + $loc_x * $board_size];
         if ($put_target_cell != Game::$NONE)
@@ -100,7 +101,7 @@ class Game extends Model
             return false;
         }
         // 全方向について、相手の石を挟んでいるかチェックする
-        return Game::watchLine($game, $loc_x, $loc_y);
+        return Game::watchLine($game, $loc_x, $loc_y, $stone_number);
     }
 
     // 石を置き、相手の石を裏返す
@@ -130,24 +131,8 @@ class Game extends Model
     // 石を置ける場所がなければtrueを返す
     static public function isGameEnd($game)
     {
-        $board_size = $game->board_size;
-        for($y = 0; $y < $board_size; $y++)
-        {
-            for($x = 0; $x < $board_size; $x++)
-            {
-                if($game->cells[$y + $x * $board_size] != Game::$NONE)
-                {
-                    continue;
-                }
-                if(Game::canPut($x, $y, Game::$FIRST_COLOR_STONE) || Game::canPut($x, $y, Game::$SECOND_COLOR_STONE))
-                {
-                    // 石を置ける場所がある
-                    return false;
-                }
-            }
-        }
-        // 石を置ける場所がない
-        return true;
+        $can_put_space = Game::canPutSpace($game, true) || Game::canPutSpace($game, false);
+        return !$can_put_space;
     }
 
     // 両プレイヤーの石を数える
@@ -170,6 +155,29 @@ class Game extends Model
             }
         }
         return $stone_nums;
+    }
+
+    // 石を置ける場所があればtrueを返す
+    static public function canPutSpace($game, $is_first_turn)
+    {
+        $board_size = $game->board_size;
+        for($y = 0; $y < $board_size; $y++)
+        {
+            for($x = 0; $x < $board_size; $x++)
+            {
+                if($game->cells[$y + $x * $board_size] != Game::$NONE)
+                {
+                    continue;
+                }
+                if(Game::canPut($game, $x, $y, $is_first_turn))
+                {
+                    // 石を置ける場所がある
+                    return true;
+                }
+            }
+        }
+        // 石を置ける場所がない
+        return false;
     }
 
     // 初期状態の石の配置を一次元配列で取得する
@@ -200,10 +208,8 @@ class Game extends Model
         return $cells;
     }
 
-    static private function watchLine($game, $x, $y)
+    static private function watchLine($game, $x, $y, $stone_number)
     {
-        $stone_number = $game->turn_now ? Game::$FIRST_COLOR_STONE : Game::$SECOND_COLOR_STONE;
-
         Game::initDirectionArray();
 
         // 各方向について処理

@@ -30,5 +30,6 @@ Route::post('watch_room',    'Api\RoomController@watch');
 Route::post('create_offline_game',  'Api\GameController@createOfflineGame');
 Route::post('put_stone',            'Api\GameController@putStone');
 Route::post('judge',                'Api\GameController@judge');
+Route::post('restart_game',         'Api\GameController@restartGame');
 Route::post('get_priority',         'Api\GameController@getPriority');
 Route::post('set_turn',             'Api\GameController@setTurn');

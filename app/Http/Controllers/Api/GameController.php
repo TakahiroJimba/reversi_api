@@ -96,7 +96,7 @@ class GameController extends Controller
         }
 
         // 石が置けるかチェックする
-        if (!Game::canPut($game, $loc_x, $loc_y))
+        if (!Game::canPut($game, $loc_x, $loc_y, $game->turn_now))
         {
             log::error("石が置けない場所。game_id: " . $game_id . ", user_id: " . $user_id);
             $data['err_status'] = $this->ERR_STATUS_CAN_NOT_PUT;
@@ -104,7 +104,10 @@ class GameController extends Controller
         }
 
         // 石を置き、相手の石を裏返す
-        $new_cells = Game::putStone($game, $loc_x, $loc_y);
+        $game->cells = Game::putStone($game, $loc_x, $loc_y);
+
+        // 次のターンプレイヤーの石を置ける場所がなければ、ターンチェンジしない
+        $next_turn = Game::canPutSpace($game, !$game->turn_now) ? !$game->turn_now : $game->turn_now;
 
         // 消費時間(秒数)を計算する
         $diff_play_time_seconds = Carbon::now()->diffInSeconds(new Carbon($game->updated_at));
@@ -113,10 +116,10 @@ class GameController extends Controller
 
         try
         {
-            // 石を配置(cellsを更新)し、相手のターンに変更する
+            // 石を配置(cellsを更新)し、相手の石が置ける場合はターンチェンジする
             $updated_num = Game::updateCellsAndTurn($game_id,
-                                                    $new_cells,
-                                                    !$game->turn_now,
+                                                    $game->cells,
+                                                    $next_turn, // !$game->turn_now,
                                                     $play_time,
                                                     $game->turn_now);
         }
@@ -227,6 +230,38 @@ class GameController extends Controller
         // 処理成功
         $data['is_success'] = '1';
         return json_encode($data);
+    }
+
+    // ボードの状態を初期化し、ゲームを最初からやり直す
+    public function restartGame()
+    {
+        log::debug('Api/Game/restartGame');
+
+        // パラメータ取得
+        $game_id = $_POST["game_id"];
+
+        $data['is_success'] = '0';
+
+        // board_sizeが偶数か確認する
+        if ($board_size % 2 != 0)
+        {
+            log::error("board_sizeが偶数でない。board_size: " . $board_size);
+            return json_encode($data);
+        }
+
+        // Gameレコード新規作成
+        $game_id = Game::insertGame(GAME_MODE_ID_OFFLINE,
+                                    $user_id,
+                                    $user_id,
+                                    $board_size,
+                                    $user_id,
+                                    true,
+                                    $user_id);
+
+        $data['is_success'] = '1';
+        $data['game_id']    = $game_id;
+        return json_encode($data);
+
     }
 
     // 優先権確認
