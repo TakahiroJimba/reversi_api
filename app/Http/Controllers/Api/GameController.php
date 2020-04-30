@@ -232,36 +232,33 @@ class GameController extends Controller
         return json_encode($data);
     }
 
-    // ボードの状態を初期化し、ゲームを最初からやり直す
-    public function restartGame()
+    // ゲームの状態を削除する
+    public function deleteGame()
     {
         log::debug('Api/Game/restartGame');
 
         // パラメータ取得
         $game_id = $_POST["game_id"];
+        $user_id = $_POST["user_id"];
 
         $data['is_success'] = '0';
 
-        // board_sizeが偶数か確認する
-        if ($board_size % 2 != 0)
+        // Gameレコード取得
+        $game = Game::getGameById($game_id);
+
+        // ゲームをやり直す処理はオフラインモードの時のみ有効
+        if ($game->user_id != $user_id || $game->game_mode_id != GAME_MODE_ID_OFFLINE)
         {
-            log::error("board_sizeが偶数でない。board_size: " . $board_size);
+            log::warn("不正なパラメータ。game_id: " . $game_id . ", user_id: " . $user_id);
             return json_encode($data);
         }
 
-        // Gameレコード新規作成
-        $game_id = Game::insertGame(GAME_MODE_ID_OFFLINE,
-                                    $user_id,
-                                    $user_id,
-                                    $board_size,
-                                    $user_id,
-                                    true,
-                                    $user_id);
+        // Gameレコード削除
+        Game::deleteGame($game->id);
 
+        // 削除成功
         $data['is_success'] = '1';
-        $data['game_id']    = $game_id;
         return json_encode($data);
-
     }
 
     // 優先権確認

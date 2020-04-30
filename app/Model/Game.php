@@ -82,6 +82,20 @@ class Game extends Model
             ]);
     }
 
+    // Gameレコード初期化更新
+    static public function initUpdateGame($game)
+    {
+        return DB::table('game')
+            ->where('id', $game->id)
+            ->update([
+                        'cells'                => Game::getInitCells($game->board_size),
+                        'turn_now'             => true,
+                        'user_play_time'       => 0,
+                        'challenger_play_time' => 0,
+                        'updated_at'           => Carbon::now(),
+            ]);
+    }
+
     static public function deleteGame($game_id)
     {
         DB::table('game')

@@ -23,8 +23,8 @@ class GameTable extends Migration
             $table->integer('first_user')->unsigned();
             $table->boolean('turn_now')->nullable();
             $table->integer('turn_priority')->unsigned();
-            $table->integer('user_play_time')->unsigned()->default(0);;
-            $table->integer('challenger_play_time')->unsigned()->default(0);;
+            $table->integer('user_play_time')->unsigned()->default(0);
+            $table->integer('challenger_play_time')->unsigned()->default(0);
             $table->timestamps();
             $table->softDeletes();      // deleted_at
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
