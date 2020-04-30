@@ -17,8 +17,11 @@ class HistoryTable extends Migration
             $table->bigIncrements('id')->index();
             $table->integer('user_id')->unsigned()->index();
             $table->integer('opponent_user_id')->unsigned()->index();
+            $table->integer('game_mode_id')->unsigned()->index();
             $table->integer('board_size')->index();
+            $table->string('cells');
             $table->integer('my_stone_num')->index();
+            $table->integer('opponent_stone_num')->index();
             $table->integer('result_id')->unsigned()->index();
             $table->boolean('is_first');
             $table->integer('game_total_time')->unsigned();
@@ -27,6 +30,7 @@ class HistoryTable extends Migration
             $table->softDeletes();      // deleted_at
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); //外部キー参照
             // $table->foreign('opponent_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('game_mode_id')->references('id')->on('game_mode')->onDelete('cascade');
             $table->foreign('result_id')->references('id')->on('results')->onDelete('cascade');
         });
     }

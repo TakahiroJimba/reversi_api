@@ -28,19 +28,23 @@ class Game extends Model
     }
 
     // ゲーム開始時に使用
-    static public function insertGame($user_id,
+    static public function insertGame($game_mode_id,
+                                      $user_id,
                                       $challenger_user_id,
                                       $board_size,
-                                      $turn,
+                                      $first_user,
+                                      $turn_now,
                                       $turn_priority)
     {
         $now = Carbon::now();
         $game = [
+            'game_mode_id'       => $game_mode_id,
             'user_id'            => $user_id,
             'challenger_user_id' => $challenger_user_id,
             'board_size'         => $board_size,
             'cells'              => Game::getInitCells($board_size),
-            'turn'               => $turn,
+            'first_user'         => $first_user,
+            'turn_now'           => $turn_now,
             'turn_priority'      => $turn_priority,
             'created_at'         => $now,
             'updated_at'         => $now,
@@ -51,16 +55,38 @@ class Game extends Model
     // 石を配置(cells更新)し、相手のターンに変更する
     static public function updateCellsAndTurn($game_id,
                                               $cells,
-                                              $turn)
+                                              $turn_now,
+                                              $play_time,
+                                              $is_first)
     {
+        if ($is_first)
+        {
+            // 更新件数を返す
+            return DB::table('game')
+                ->where('id', $game_id)
+                ->update([
+                            'cells'          => $cells,
+                            'turn_now'       => $turn_now,
+                            'user_play_time' => $play_time,
+                            'updated_at'     => Carbon::now(),
+                ]);
+        }
         // 更新件数を返す
         return DB::table('game')
             ->where('id', $game_id)
             ->update([
-                        'cells'      => $cells,
-                        'turn'       => $turn,
-                        'updated_at' => Carbon::now(),
+                        'cells'                => $cells,
+                        'turn_now'             => $turn_now,
+                        'challenger_play_time' => $play_time,
+                        'updated_at'           => Carbon::now(),
             ]);
+    }
+
+    static public function deleteGame($game_id)
+    {
+        DB::table('game')
+            ->where('id', $game_id)
+            ->delete();
     }
 
     // 石が置けるか確認
@@ -81,7 +107,7 @@ class Game extends Model
     static public function putStone($game, $x, $y)
     {
         $cells = $game->cells;
-        $stone_number = $game->turn ? Game::$FIRST_COLOR_STONE : Game::$SECOND_COLOR_STONE;
+        $stone_number = $game->turn_now ? Game::$FIRST_COLOR_STONE : Game::$SECOND_COLOR_STONE;
 
         // 石を置く
         $cells[$y + $x * $game->board_size] = $stone_number;
@@ -99,6 +125,51 @@ class Game extends Model
             }
         }
         return $cells;
+    }
+
+    // 石を置ける場所がなければtrueを返す
+    static public function isGameEnd($game)
+    {
+        $board_size = $game->board_size;
+        for($y = 0; $y < $board_size; $y++)
+        {
+            for($x = 0; $x < $board_size; $x++)
+            {
+                if($game->cells[$y + $x * $board_size] != Game::$NONE)
+                {
+                    continue;
+                }
+                if(Game::canPut($x, $y, Game::$FIRST_COLOR_STONE) || Game::canPut($x, $y, Game::$SECOND_COLOR_STONE))
+                {
+                    // 石を置ける場所がある
+                    return false;
+                }
+            }
+        }
+        // 石を置ける場所がない
+        return true;
+    }
+
+    // 両プレイヤーの石を数える
+    static public function countStones($game)
+    {
+        $stone_nums['first']  = 0;
+        $stone_nums['second'] = 0;
+        for($y = 0; $y < $game->board_size; $y++)
+        {
+            for($x = 0; $x < $game->board_size; $x++)
+            {
+                if ($game->cells[$y + $x * $game->board_size] == Game::$FIRST_COLOR_STONE)
+                {
+                    $stone_nums['first']++;
+                }
+                elseif ($game->cells[$y + $x * $game->board_size] == Game::$SECOND_COLOR_STONE)
+                {
+                    $stone_nums['second']++;
+                }
+            }
+        }
+        return $stone_nums;
     }
 
     // 初期状態の石の配置を一次元配列で取得する
@@ -131,7 +202,7 @@ class Game extends Model
 
     static private function watchLine($game, $x, $y)
     {
-        $stone_number = $game->turn ? Game::$FIRST_COLOR_STONE : Game::$SECOND_COLOR_STONE;
+        $stone_number = $game->turn_now ? Game::$FIRST_COLOR_STONE : Game::$SECOND_COLOR_STONE;
 
         Game::initDirectionArray();
 
